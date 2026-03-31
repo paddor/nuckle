@@ -1,27 +1,26 @@
-# Nuckle
+# 🤜 Nuckle
 
-Pure Ruby implementation of the NaCl crypto primitives. No C extensions,
-no FFI, no libsodium. Just Ruby.
+[![Gem Version](https://img.shields.io/gem/v/nuckle)](https://rubygems.org/gems/nuckle)
+[![CI](https://github.com/paddor/nuckle/actions/workflows/ci.yml/badge.svg)](https://github.com/paddor/nuckle/actions/workflows/ci.yml)
+
+NaCl for Knuckleheads — pure Ruby crypto primitives, no libsodium required.
 
 ## Is it any good?
 
-No.
+No. See [SECURITY.md](SECURITY.md).
 
-## Why does this exist?
+## ⚠️ Don't use this
+
+Ruby's bignum arithmetic is not constant-time, so private keys leak
+through timing side channels. Use
+[rbnacl](https://github.com/RubyCrypto/rbnacl) for anything that matters.
+
+## 🤷 Why does this exist?
 
 - Zero-dependency development and CI environments
 - Seeing how well Ruby's YJIT performs at crypto ("just for fun")
 - Educational purposes
 - Environments where installing libsodium is impractical
-
-**This is not a good idea for production.** Ruby's bignum arithmetic
-is not constant-time at the hardware level, making it vulnerable to
-side-channel timing attacks. Use [rbnacl](https://github.com/RubyCrypto/rbnacl)
-for anything that matters.
-
-A best-effort constant-time string comparison is included (XOR
-accumulator), but YJIT or the Ruby runtime may not preserve timing
-invariance.
 
 ## Primitives
 
