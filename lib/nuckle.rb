@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Pure Ruby NaCl-compatible cryptography library.
+# Provides Curve25519 key agreement, XSalsa20-Poly1305 authenticated
+# encryption (SecretBox), and public-key authenticated encryption (Box).
+
 require_relative "nuckle/version"
 require_relative "nuckle/crypto_error"
 require_relative "nuckle/random"

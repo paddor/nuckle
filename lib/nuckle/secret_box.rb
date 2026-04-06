@@ -12,6 +12,8 @@ module Nuckle
     BOXZEROBYTES = 16
     MACBYTES     = 16
 
+
+    # @param key [String] 32-byte symmetric key (binary)
     def initialize(key)
       key = key.b
       raise ArgumentError, "key must be #{KEYBYTES} bytes (got #{key.bytesize})" unless key.bytesize == KEYBYTES
@@ -19,7 +21,10 @@ module Nuckle
       @key = key
     end
 
+
+    # @return [Integer] required nonce length in bytes
     def nonce_bytes = NONCEBYTES
+    # @return [Integer] required key length in bytes
     def key_bytes   = KEYBYTES
 
     # Encrypt plaintext with 24-byte nonce.
@@ -46,6 +51,7 @@ module Nuckle
       # Actually NaCl convention: c[0..15] are zeros, c[16..31] replaced by mac
       mac + c.byteslice(ZEROBYTES..)
     end
+
 
     # Decrypt ciphertext with 24-byte nonce.
     #
@@ -75,6 +81,7 @@ module Nuckle
       m      = Internals::Salsa20.xsalsa20_xor(@key, nonce, padded)
       m.byteslice(ZEROBYTES..)
     end
+
 
     # Aliases matching rbnacl API
     alias box encrypt

@@ -12,6 +12,9 @@ module Nuckle
     BEFORENMBYTES  = 32
     MACBYTES       = 16
 
+
+    # @param public_key [PublicKey, String] peer's 32-byte public key
+    # @param private_key [PrivateKey, String] own 32-byte private key
     def initialize(public_key, private_key)
       pk = extract_bytes(public_key, PUBLICKEYBYTES, "public key")
       sk = extract_bytes(private_key, PRIVATEKEYBYTES, "private key")
@@ -25,12 +28,15 @@ module Nuckle
       @secret_box = SecretBox.new(key)
     end
 
+
+    # @return [Integer] required nonce length in bytes
     def nonce_bytes = NONCEBYTES
 
     # Encrypt plaintext with 24-byte nonce.
     def encrypt(nonce, plaintext)
       @secret_box.encrypt(nonce, plaintext)
     end
+
 
     # Decrypt ciphertext with 24-byte nonce.
     def decrypt(nonce, ciphertext)
@@ -44,9 +50,12 @@ module Nuckle
 
     def extract_bytes(key, expected_size, name)
       bytes = case key
-              when PublicKey, PrivateKey then key.to_s
-              when String               then key.b
-              else raise ArgumentError, "#{name} must be a Key or String"
+              when PublicKey, PrivateKey
+                key.to_s
+              when String
+                key.b
+              else
+                raise ArgumentError, "#{name} must be a Key or String"
               end
       raise ArgumentError, "#{name} must be #{expected_size} bytes (got #{bytes.bytesize})" unless bytes.bytesize == expected_size
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
 module Nuckle
-  class CryptoError < StandardError; end
+  # Raised when authenticated decryption fails (MAC verification failure).
+  class CryptoError < StandardError
+  end
 end
