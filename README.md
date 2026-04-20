@@ -74,6 +74,28 @@ If you know what you're doing:
 RbNaCl = Nuckle
 ```
 
+## Performance
+
+Pure Ruby versus the native equivalents (`rbnacl`/libsodium, `blake3-rb`,
+`chacha20blake3`). Ruby 4.0.2 with YJIT, on a single core.
+Numbers are slowdown factors (smaller = closer to native);
+run `bundle exec ruby --yjit bench/primitives.rb` to reproduce.
+
+| Primitive                       |  256 B |   1 KB |   4 KB |  16 KB |
+| ------------------------------- | -----: | -----: | -----: | -----: |
+| BLAKE3 hash                     |   46×  |  118×  |  340×  |  716×  |
+| Poly1305 MAC                    |   31×  |   83×  |  161×  |  221×  |
+| SecretBox (XSalsa20-Poly1305)   |   40×  |   65×  |  123×  |  166×  |
+| Box (Curve25519-XSalsa20-Poly.) |   46×  |   73×  |  125×  |  162×  |
+| ChaCha20-BLAKE3 AEAD            |  108×  |  159×  |  242×  |  323×  |
+
+Size-independent: Curve25519 scalar multiplication ~42× slower; full
+keypair generation ~45× slower.
+
+XSalsa20 and ChaCha20 stream ciphers have no direct `rbnacl` counterpart,
+so no comparison is shown; nuckle runs them at roughly 30 k ops/s at 256 B
+and 550 ops/s at 16 KB.
+
 ## Verification
 
 All primitives are tested against rbnacl/libsodium test vectors
