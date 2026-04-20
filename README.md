@@ -28,9 +28,12 @@ through timing side channels. Use
 |-----------|-------------|
 | **Curve25519** | Elliptic-curve Diffie-Hellman (key agreement) |
 | **XSalsa20** | Extended-nonce stream cipher (includes HSalsa20, Salsa20) |
+| **ChaCha20** | Stream cipher (DJB's 8-byte-nonce variant) |
 | **Poly1305** | One-time message authenticator |
+| **BLAKE3** | Cryptographic hash — unkeyed, keyed, `derive_key`, XOF |
 | **Box** | Public-key authenticated encryption (Curve25519-XSalsa20-Poly1305) |
 | **SecretBox** | Symmetric authenticated encryption (XSalsa20-Poly1305) |
+| **ChaCha20-BLAKE3** | Authenticated encryption AEAD, wire-compatible with [skerkour/chacha20-blake3](https://github.com/skerkour/chacha20-blake3) |
 
 ## Usage
 
