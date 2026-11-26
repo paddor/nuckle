@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-26
+
 ### Fixed
 
 - `Box.new` and `PrivateKey#diffie_hellman` raise `CryptoError` for
