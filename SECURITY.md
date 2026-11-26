@@ -1,9 +1,9 @@
 # Security
 
 Nuckle is a pure Ruby NaCl implementation. The algorithms are correct
-(tested byte-for-byte against libsodium), but the implementation is
-**not suitable for production use against adversaries who can measure
-timing**.
+(tested byte for byte against libsodium and reference test vectors),
+but the implementation is **not suitable for production use against
+adversaries who can measure timing**.
 
 ## Timing side channels
 
@@ -17,19 +17,20 @@ multiply/mod take different amounts of time depending on operand values
   time depending on the magnitudes of `a` and `b`.
 - **Poly1305 MAC** computation time depends on message content and
   key material.
-- **XSalsa20** is the least vulnerable — Fixnum arithmetic on 32-bit
-  words that YJIT compiles to native ops — but the interpreter's
-  dispatch overhead may still vary without YJIT.
+- **XSalsa20, ChaCha20 and BLAKE3** are the least vulnerable. They use
+  Fixnum arithmetic on 32-bit words that YJIT compiles to native ops,
+  but the interpreter's dispatch overhead may still vary without YJIT.
 
 A network attacker measuring handshake timing across many connections
 could extract the server's permanent private key. This is the same
 class of attack that broke early OpenSSL RSA implementations and is
 well-demonstrated against ECDH.
 
-String comparisons (MAC verification, vouch checks) use Ruby's native
-`String#==`, which short-circuits on the first differing byte. This is
-an honest choice: pretending to be constant-time when everything else
-leaks would be worse than being upfront about it.
+MAC and tag checks, `PublicKey#==` and `Util.verify16/32/64` XOR every
+byte pair and OR the results. Unlike `String#==`, they do not stop at
+the first differing byte. This removes the cheapest leak (it costs
+about 0.2 µs per 16-byte tag; a 1 KiB SecretBox decrypt takes 280 µs),
+but it is not a constant-time guarantee. Ruby makes none.
 
 ## No memory protection
 
@@ -42,14 +43,17 @@ and `sodium_memzero()` to wipe keys after use. Nuckle does neither:
   overwritten)
 - They can end up in swap, core dumps, or process memory snapshots
 
-## No low-order point rejection
+## Low-order points
 
-The code clamps the scalar (per RFC 7748), but does not check for
-low-order points on the input u-coordinate. libsodium rejects the
-all-zeros public key and a handful of other small-subgroup points.
-Nuckle will compute `scalarmult(sk, "\x00" * 32)` and return all
-zeros, which could be exploited in protocols that don't independently
-validate public keys.
+`Box.new` and `PrivateKey#diffie_hellman` raise `CryptoError` when the
+X25519 result is all zero, as libsodium's `crypto_scalarmult` does.
+This catches every low-order public key, including non-canonical
+encodings and encodings with the top bit set. RbNaCl raises the same
+error, but `RbNaCl::Box` only raises it on the first encrypt or
+decrypt.
+
+`Nuckle::Internals::Curve25519.scalarmult` does not check. Code that
+calls it directly must reject an all-zero result itself.
 
 ## Ruby runtime attack surface
 
@@ -62,10 +66,15 @@ validate public keys.
 
 ## What is fine
 
-- The algorithms are correct (cross-validated against rbnacl/libsodium)
-- Nonce handling and replay detection are sound
-- The CurveZMQ handshake protocol follows RFC 26 faithfully
+- X25519, XSalsa20, Poly1305, Box and SecretBox match libsodium (via
+  rbnacl) byte for byte, and pass the RFC 7748 and RFC 8439 vectors
+- BLAKE3 matches the official test vectors and `blake3-rb`
+- ChaCha20-BLAKE3 matches the upstream crate's vectors and the
+  `chacha20blake3` gem
 - Poly1305 one-time-key derivation is correct
+
+Nuckle has no protocol code. Nonce choice, replay protection and
+handshakes (such as CurveZMQ in protocol-zmtp) are the caller's job.
 
 ## Recommendation
 

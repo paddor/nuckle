@@ -6,6 +6,7 @@
 
 require_relative "nuckle/version"
 require_relative "nuckle/crypto_error"
+require_relative "nuckle/length_error"
 require_relative "nuckle/random"
 require_relative "nuckle/util"
 require_relative "nuckle/internals/curve25519"

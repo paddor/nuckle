@@ -1,5 +1,48 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Box.new` and `PrivateKey#diffie_hellman` raise `CryptoError` for
+  low-order public keys (all-zero X25519 output), like libsodium.
+  `RbNaCl::Box` raises the same error on first use instead of in `new`.
+- `Box.new`, `PublicKey.new`, `PrivateKey.new` and
+  `PrivateKey#diffie_hellman` raise `TypeError` (was `ArgumentError`, or
+  nothing) for a key of the wrong type: swapped key objects, `nil`, or
+  anything without `#to_str`. Before, `PublicKey.new(private_key)` and
+  `PrivateKey.new(12345678901234567890123456789012)` worked, and objects
+  with `#to_str` failed. RbNaCl also raises `TypeError` for non-strings,
+  but takes swapped key objects.
+- `Util.verify`, `verify16/32/64` (and so MAC/tag checks and
+  `PublicKey#==`) XOR-fold all bytes instead of using `String#==`, which
+  stops at the first differing byte. The docs no longer call them
+  constant-time.
+- `PrivateKey`, `SecretBox`, `Box` and `Chacha20Blake3::Cipher` no longer
+  show key bytes in `#inspect` or `pp` output.
+- `PrivateKey#to_s`/`#to_bytes` and `PublicKey#to_s`/`#to_bytes` return
+  frozen strings. Before, mutating the returned string changed the key.
+- `Internals::Blake3.hash` with no arguments falls back to `Object#hash`.
+  Before, using the module as a Hash key or in `#uniq` raised
+  `ArgumentError`.
+
+### Added
+
+- `Util.zero?`: checks a string for all zero bytes, with no early exit.
+- `LengthError < ArgumentError`, raised for wrong-size keys, nonces and
+  tags, like `RbNaCl::LengthError`. Code that rescues `ArgumentError`
+  still works.
+
+### Changed
+
+- `SECURITY.md`: drop the claims about nonce handling, replay detection
+  and CurveZMQ. Nuckle has none of that code; it lives in protocol-zmtp.
+  Cover ChaCha20 and BLAKE3.
+- Tests: RFC 7748 section 5.2 vectors (with 1 and 1,000 iterations),
+  non-canonical u-coordinates, all RFC 8439 A.3 Poly1305 vectors, and
+  the official BLAKE3 `test_vectors.json` (hash, keyed hash, derive key,
+  extended output, streaming). README lists what is actually tested.
+
 ## 0.3.0 — 2026-04-20
 
 ### Added

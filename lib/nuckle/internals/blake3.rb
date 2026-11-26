@@ -252,7 +252,12 @@ module Nuckle
       end
 
       # One-shot unkeyed hash.
-      def hash(input, length = OUT_LEN)
+      #
+      # Called with no arguments, this is Object#hash, so the module still
+      # works as a Hash key.
+      def hash(input = (no_input = true), length = OUT_LEN)
+        return super() if no_input
+
         Hasher.new(IV, 0).update(input).finalize(length)
       end
 
@@ -267,7 +272,7 @@ module Nuckle
       end
 
       def new_keyed(key)
-        raise ArgumentError, "key must be 32 bytes" unless key.bytesize == KEY_LEN
+        raise LengthError, "key must be 32 bytes" unless key.bytesize == KEY_LEN
 
         Hasher.new(key.b.unpack("V8"), KEYED_HASH)
       end

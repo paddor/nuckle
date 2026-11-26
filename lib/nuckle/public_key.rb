@@ -7,22 +7,25 @@ module Nuckle
     BYTES = 32
 
 
-    # @param key [String] 32-byte raw public key (binary)
+    # @param key [String, PublicKey] 32-byte raw public key (binary)
+    # @raise [TypeError] if +key+ is neither a PublicKey nor a String
     def initialize(key)
-      key = key.to_s if key.respond_to?(:to_s) && !key.is_a?(String)
-      key = key.b
-      raise ArgumentError, "public key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
+      key = key.to_s if key.is_a?(PublicKey)
+      raise TypeError, "public key must be a String or #{PublicKey} (got #{key.class})" unless key.respond_to?(:to_str)
 
-      @key = key
+      key = key.to_str.b
+      raise LengthError, "public key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
+
+      @key = key.freeze
     end
 
 
-    # @return [String] raw 32-byte key (binary)
+    # @return [String] raw 32-byte key (binary, frozen)
     def to_bytes = @key
-    # @return [String] raw 32-byte key (binary)
+    # @return [String] raw 32-byte key (binary, frozen)
     def to_s     = @key
 
-    # Constant-time equality comparison.
+    # Equality without an early exit (see {Util.verify}).
     #
     # @param other [PublicKey] key to compare
     # @return [Boolean]

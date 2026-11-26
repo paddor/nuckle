@@ -25,7 +25,7 @@ module Nuckle
       # @param key [String] 32-byte master key
       def initialize(key)
         key = key.b
-        raise ArgumentError, "key must be #{KEYBYTES} bytes (got #{key.bytesize})" unless key.bytesize == KEYBYTES
+        raise LengthError, "key must be #{KEYBYTES} bytes (got #{key.bytesize})" unless key.bytesize == KEYBYTES
 
         @key = key
       end
@@ -76,7 +76,7 @@ module Nuckle
       # @raise [CryptoError] on authentication failure
       def decrypt_detached(nonce, ciphertext, tag, aad: "")
         tag = tag.b
-        raise ArgumentError, "tag must be #{TAGBYTES} bytes" unless tag.bytesize == TAGBYTES
+        raise LengthError, "tag must be #{TAGBYTES} bytes" unless tag.bytesize == TAGBYTES
 
         ciphertext = ciphertext.b
         enc_key, auth_key, enc_nonce = derive_subkeys(nonce)
@@ -86,11 +86,19 @@ module Nuckle
         Internals::Chacha20.xor(enc_key, enc_nonce, ciphertext)
       end
 
+
+      # Hides the key bytes, so they stay out of logs and error output.
+      #
+      # @return [String]
+      def inspect
+        "#<#{self.class}>"
+      end
+
       private
 
       def derive_subkeys(nonce)
         nonce = nonce.b
-        raise ArgumentError, "nonce must be #{NONCEBYTES} bytes" unless nonce.bytesize == NONCEBYTES
+        raise LengthError, "nonce must be #{NONCEBYTES} bytes" unless nonce.bytesize == NONCEBYTES
 
         kdf = Internals::Blake3.new_keyed(@key).update(nonce).finalize_xof.read(72)
         [kdf.byteslice(0, 32), kdf.byteslice(32, 32), kdf.byteslice(64, 8)]
