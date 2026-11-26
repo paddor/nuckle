@@ -12,6 +12,12 @@
 
 - `Util.zero?`: checks a string for all zero bytes, with no early exit.
 
+### Changed
+
+- `SECURITY.md`: drop the claims about nonce handling, replay detection
+  and CurveZMQ. Nuckle has none of that code; it lives in protocol-zmtp.
+  Cover ChaCha20 and BLAKE3.
+
 ## 0.3.0 — 2026-04-20
 
 ### Added

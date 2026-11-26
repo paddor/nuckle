@@ -1,9 +1,9 @@
 # Security
 
 Nuckle is a pure Ruby NaCl implementation. The algorithms are correct
-(tested byte-for-byte against libsodium), but the implementation is
-**not suitable for production use against adversaries who can measure
-timing**.
+(tested byte for byte against libsodium and reference test vectors),
+but the implementation is **not suitable for production use against
+adversaries who can measure timing**.
 
 ## Timing side channels
 
@@ -17,9 +17,9 @@ multiply/mod take different amounts of time depending on operand values
   time depending on the magnitudes of `a` and `b`.
 - **Poly1305 MAC** computation time depends on message content and
   key material.
-- **XSalsa20** is the least vulnerable — Fixnum arithmetic on 32-bit
-  words that YJIT compiles to native ops — but the interpreter's
-  dispatch overhead may still vary without YJIT.
+- **XSalsa20, ChaCha20 and BLAKE3** are the least vulnerable. They use
+  Fixnum arithmetic on 32-bit words that YJIT compiles to native ops,
+  but the interpreter's dispatch overhead may still vary without YJIT.
 
 A network attacker measuring handshake timing across many connections
 could extract the server's permanent private key. This is the same
@@ -65,10 +65,15 @@ calls it directly must reject an all-zero result itself.
 
 ## What is fine
 
-- The algorithms are correct (cross-validated against rbnacl/libsodium)
-- Nonce handling and replay detection are sound
-- The CurveZMQ handshake protocol follows RFC 26 faithfully
+- X25519, XSalsa20, Poly1305, Box and SecretBox match libsodium (via
+  rbnacl) byte for byte, and pass the RFC 7748 and RFC 8439 vectors
+- BLAKE3 matches the official test vectors and `blake3-rb`
+- ChaCha20-BLAKE3 matches the upstream crate's vectors and the
+  `chacha20blake3` gem
 - Poly1305 one-time-key derivation is correct
+
+Nuckle has no protocol code. Nonce choice, replay protection and
+handshakes (such as CurveZMQ in protocol-zmtp) are the caller's job.
 
 ## Recommendation
 
