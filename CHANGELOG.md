@@ -14,6 +14,10 @@
   `PrivateKey.new(12345678901234567890123456789012)` worked, and objects
   with `#to_str` failed. RbNaCl also raises `TypeError` for non-strings,
   but takes swapped key objects.
+- `Util.verify`, `verify16/32/64` (and so MAC/tag checks and
+  `PublicKey#==`) XOR-fold all bytes instead of using `String#==`, which
+  stops at the first differing byte. The docs no longer call them
+  constant-time.
 
 ### Added
 

@@ -25,7 +25,7 @@ module Nuckle
     # @return [String] raw 32-byte key (binary)
     def to_s     = @key
 
-    # Constant-time equality comparison.
+    # Equality without an early exit (see {Util.verify}).
     #
     # @param other [PublicKey] key to compare
     # @return [Boolean]

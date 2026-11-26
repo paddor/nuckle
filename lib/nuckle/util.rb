@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Nuckle
-  # Constant-time comparison utilities for cryptographic data.
+  # Comparison utilities for cryptographic data. They have no early exit,
+  # but Ruby gives no constant-time guarantee (see SECURITY.md).
   module Util
     # Compare two 16-byte strings.
     def self.verify16(a, b)
@@ -21,18 +22,21 @@ module Nuckle
     end
 
 
-    # Compares two binary strings for equality.
+    # Compares two strings byte by byte. XORs every byte pair and ORs the
+    # results, so unlike String#== it does not stop at the first
+    # difference. Lengths are not treated as secret.
     #
     # @param a [String] first string
     # @param b [String] second string
     # @param expected_size [Integer, nil] required byte length, or nil to skip check
     # @return [Boolean]
     def self.verify(a, b, expected_size = nil)
-      a = a.b if a.encoding != Encoding::BINARY
-      b = b.b if b.encoding != Encoding::BINARY
       return false if expected_size && (a.bytesize != expected_size || b.bytesize != expected_size)
+      return false unless a.bytesize == b.bytesize
 
-      a == b
+      diff = 0
+      a.bytesize.times { |i| diff |= a.getbyte(i) ^ b.getbyte(i) }
+      diff.zero?
     end
 
 

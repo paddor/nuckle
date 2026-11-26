@@ -26,10 +26,11 @@ could extract the server's permanent private key. This is the same
 class of attack that broke early OpenSSL RSA implementations and is
 well-demonstrated against ECDH.
 
-String comparisons (MAC verification, vouch checks) use Ruby's native
-`String#==`, which short-circuits on the first differing byte. This is
-an honest choice: pretending to be constant-time when everything else
-leaks would be worse than being upfront about it.
+MAC and tag checks, `PublicKey#==` and `Util.verify16/32/64` XOR every
+byte pair and OR the results. Unlike `String#==`, they do not stop at
+the first differing byte. This removes the cheapest leak (it costs
+about 0.2 µs per 16-byte tag; a 1 KiB SecretBox decrypt takes 280 µs),
+but it is not a constant-time guarantee. Ruby makes none.
 
 ## No memory protection
 
