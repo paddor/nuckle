@@ -16,13 +16,13 @@ module Nuckle
       key = key.to_str.b
       raise ArgumentError, "public key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
 
-      @key = key
+      @key = key.freeze
     end
 
 
-    # @return [String] raw 32-byte key (binary)
+    # @return [String] raw 32-byte key (binary, frozen)
     def to_bytes = @key
-    # @return [String] raw 32-byte key (binary)
+    # @return [String] raw 32-byte key (binary, frozen)
     def to_s     = @key
 
     # Equality without an early exit (see {Util.verify}).

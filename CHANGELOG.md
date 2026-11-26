@@ -20,6 +20,8 @@
   constant-time.
 - `PrivateKey`, `SecretBox`, `Box` and `Chacha20Blake3::Cipher` no longer
   show key bytes in `#inspect` or `pp` output.
+- `PrivateKey#to_s`/`#to_bytes` and `PublicKey#to_s`/`#to_bytes` return
+  frozen strings. Before, mutating the returned string changed the key.
 
 ### Added
 
