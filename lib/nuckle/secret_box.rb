@@ -86,5 +86,13 @@ module Nuckle
     # Aliases matching rbnacl API
     alias box encrypt
     alias open decrypt
+
+
+    # Hides the key bytes, so they stay out of logs and error output.
+    #
+    # @return [String]
+    def inspect
+      "#<#{self.class}>"
+    end
   end
 end

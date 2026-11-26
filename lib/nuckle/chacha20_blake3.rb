@@ -86,6 +86,14 @@ module Nuckle
         Internals::Chacha20.xor(enc_key, enc_nonce, ciphertext)
       end
 
+
+      # Hides the key bytes, so they stay out of logs and error output.
+      #
+      # @return [String]
+      def inspect
+        "#<#{self.class}>"
+      end
+
       private
 
       def derive_subkeys(nonce)

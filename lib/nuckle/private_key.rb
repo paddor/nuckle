@@ -64,5 +64,13 @@ module Nuckle
     def to_bytes = @key
     # @return [String] raw 32-byte key (binary)
     def to_s     = @key
+
+
+    # Hides the key bytes, so they stay out of logs and error output.
+    #
+    # @return [String]
+    def inspect
+      "#<#{self.class}>"
+    end
   end
 end

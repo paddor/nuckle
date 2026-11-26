@@ -18,6 +18,8 @@
   `PublicKey#==`) XOR-fold all bytes instead of using `String#==`, which
   stops at the first differing byte. The docs no longer call them
   constant-time.
+- `PrivateKey`, `SecretBox`, `Box` and `Chacha20Blake3::Cipher` no longer
+  show key bytes in `#inspect` or `pp` output.
 
 ### Added
 
