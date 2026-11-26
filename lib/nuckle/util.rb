@@ -34,5 +34,17 @@ module Nuckle
 
       a == b
     end
+
+
+    # Checks whether every byte is zero. ORs all bytes together, with no
+    # early exit.
+    #
+    # @param bytes [String]
+    # @return [Boolean]
+    def self.zero?(bytes)
+      acc = 0
+      bytes.each_byte { |byte| acc |= byte }
+      acc.zero?
+    end
   end
 end

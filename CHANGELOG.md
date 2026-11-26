@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Box.new` and `PrivateKey#diffie_hellman` raise `CryptoError` for
+  low-order public keys (all-zero X25519 output), like libsodium.
+  `RbNaCl::Box` raises the same error on first use instead of in `new`.
+
+### Added
+
+- `Util.zero?`: checks a string for all zero bytes, with no early exit.
+
 ## 0.3.0 — 2026-04-20
 
 ### Added

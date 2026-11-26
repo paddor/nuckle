@@ -40,8 +40,12 @@ module Nuckle
     # derivation (no HSalsa20). Callers are responsible for deriving
     # symmetric keys from the result (e.g. via HKDF or BLAKE3-derive-key).
     #
+    # Like libsodium's crypto_scalarmult, it refuses low-order public keys:
+    # those make the shared secret all zero.
+    #
     # @param peer_public_key [PublicKey, String] peer's 32-byte public key
     # @return [String] 32-byte shared secret (binary)
+    # @raise [CryptoError] if the shared secret is all zero
     def diffie_hellman(peer_public_key)
       pk = case peer_public_key
            when PublicKey
@@ -53,7 +57,10 @@ module Nuckle
            end
       raise ArgumentError, "peer public key must be 32 bytes" unless pk.bytesize == BYTES
 
-      Internals::Curve25519.scalarmult(@key, pk)
+      shared = Internals::Curve25519.scalarmult(@key, pk)
+      raise CryptoError, "low-order public key (all-zero shared secret)" if Util.zero?(shared)
+
+      shared
     end
 
 

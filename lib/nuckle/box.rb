@@ -15,12 +15,14 @@ module Nuckle
 
     # @param public_key [PublicKey, String] peer's 32-byte public key
     # @param private_key [PrivateKey, String] own 32-byte private key
+    # @raise [CryptoError] if +public_key+ is a low-order point. RbNaCl
+    #   raises the same error, but only on the first encrypt or decrypt.
     def initialize(public_key, private_key)
       pk = extract_bytes(public_key, PUBLICKEYBYTES, "public key")
       sk = extract_bytes(private_key, PRIVATEKEYBYTES, "private key")
 
       # Compute shared secret via Curve25519 DH
-      shared = Internals::Curve25519.scalarmult(sk, pk)
+      shared = PrivateKey.new(sk).diffie_hellman(pk)
 
       # Derive symmetric key via HSalsa20 (the "beforenm" step)
       key = Internals::Salsa20.hsalsa20(shared, "\x00" * 16)

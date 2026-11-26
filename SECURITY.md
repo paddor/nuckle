@@ -42,14 +42,17 @@ and `sodium_memzero()` to wipe keys after use. Nuckle does neither:
   overwritten)
 - They can end up in swap, core dumps, or process memory snapshots
 
-## No low-order point rejection
+## Low-order points
 
-The code clamps the scalar (per RFC 7748), but does not check for
-low-order points on the input u-coordinate. libsodium rejects the
-all-zeros public key and a handful of other small-subgroup points.
-Nuckle will compute `scalarmult(sk, "\x00" * 32)` and return all
-zeros, which could be exploited in protocols that don't independently
-validate public keys.
+`Box.new` and `PrivateKey#diffie_hellman` raise `CryptoError` when the
+X25519 result is all zero, as libsodium's `crypto_scalarmult` does.
+This catches every low-order public key, including non-canonical
+encodings and encodings with the top bit set. RbNaCl raises the same
+error, but `RbNaCl::Box` only raises it on the first encrypt or
+decrypt.
+
+`Nuckle::Internals::Curve25519.scalarmult` does not check. Code that
+calls it directly must reject an all-zero result itself.
 
 ## Ruby runtime attack surface
 
