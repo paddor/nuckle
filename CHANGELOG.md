@@ -7,6 +7,13 @@
 - `Box.new` and `PrivateKey#diffie_hellman` raise `CryptoError` for
   low-order public keys (all-zero X25519 output), like libsodium.
   `RbNaCl::Box` raises the same error on first use instead of in `new`.
+- `Box.new`, `PublicKey.new`, `PrivateKey.new` and
+  `PrivateKey#diffie_hellman` raise `TypeError` (was `ArgumentError`, or
+  nothing) for a key of the wrong type: swapped key objects, `nil`, or
+  anything without `#to_str`. Before, `PublicKey.new(private_key)` and
+  `PrivateKey.new(12345678901234567890123456789012)` worked, and objects
+  with `#to_str` failed. RbNaCl also raises `TypeError` for non-strings,
+  but takes swapped key objects.
 
 ### Added
 

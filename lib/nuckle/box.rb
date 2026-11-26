@@ -17,12 +17,13 @@ module Nuckle
     # @param private_key [PrivateKey, String] own 32-byte private key
     # @raise [CryptoError] if +public_key+ is a low-order point. RbNaCl
     #   raises the same error, but only on the first encrypt or decrypt.
+    # @raise [TypeError] if a key is the wrong type, e.g. the two are swapped
     def initialize(public_key, private_key)
-      pk = extract_bytes(public_key, PUBLICKEYBYTES, "public key")
-      sk = extract_bytes(private_key, PRIVATEKEYBYTES, "private key")
+      public_key  = PublicKey.new(public_key) unless public_key.is_a?(PublicKey)
+      private_key = PrivateKey.new(private_key) unless private_key.is_a?(PrivateKey)
 
       # Compute shared secret via Curve25519 DH
-      shared = PrivateKey.new(sk).diffie_hellman(pk)
+      shared = private_key.diffie_hellman(public_key)
 
       # Derive symmetric key via HSalsa20 (the "beforenm" step)
       key = Internals::Salsa20.hsalsa20(shared, "\x00" * 16)
@@ -47,21 +48,5 @@ module Nuckle
 
     alias box encrypt
     alias open decrypt
-
-    private
-
-    def extract_bytes(key, expected_size, name)
-      bytes = case key
-              when PublicKey, PrivateKey
-                key.to_s
-              when String
-                key.b
-              else
-                raise ArgumentError, "#{name} must be a Key or String"
-              end
-      raise ArgumentError, "#{name} must be #{expected_size} bytes (got #{bytes.bytesize})" unless bytes.bytesize == expected_size
-
-      bytes
-    end
   end
 end
