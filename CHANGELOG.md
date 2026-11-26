@@ -22,6 +22,9 @@
   show key bytes in `#inspect` or `pp` output.
 - `PrivateKey#to_s`/`#to_bytes` and `PublicKey#to_s`/`#to_bytes` return
   frozen strings. Before, mutating the returned string changed the key.
+- `Internals::Blake3.hash` with no arguments falls back to `Object#hash`.
+  Before, using the module as a Hash key or in `#uniq` raised
+  `ArgumentError`.
 
 ### Added
 

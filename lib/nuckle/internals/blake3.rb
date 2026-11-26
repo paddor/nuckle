@@ -252,7 +252,12 @@ module Nuckle
       end
 
       # One-shot unkeyed hash.
-      def hash(input, length = OUT_LEN)
+      #
+      # Called with no arguments, this is Object#hash, so the module still
+      # works as a Hash key.
+      def hash(input = (no_input = true), length = OUT_LEN)
+        return super() if no_input
+
         Hasher.new(IV, 0).update(input).finalize(length)
       end
 
