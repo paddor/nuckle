@@ -16,7 +16,7 @@ module Nuckle
     # @param key [String] 32-byte symmetric key (binary)
     def initialize(key)
       key = key.b
-      raise ArgumentError, "key must be #{KEYBYTES} bytes (got #{key.bytesize})" unless key.bytesize == KEYBYTES
+      raise LengthError, "key must be #{KEYBYTES} bytes (got #{key.bytesize})" unless key.bytesize == KEYBYTES
 
       @key = key
     end
@@ -36,7 +36,7 @@ module Nuckle
     def encrypt(nonce, plaintext)
       nonce     = nonce.b
       plaintext = plaintext.b
-      raise ArgumentError, "nonce must be #{NONCEBYTES} bytes" unless nonce.bytesize == NONCEBYTES
+      raise LengthError, "nonce must be #{NONCEBYTES} bytes" unless nonce.bytesize == NONCEBYTES
 
       # Pad with 32 zero bytes
       padded = ("\x00" * ZEROBYTES + plaintext).b
@@ -63,7 +63,7 @@ module Nuckle
     def decrypt(nonce, ciphertext)
       nonce      = nonce.b
       ciphertext = ciphertext.b
-      raise ArgumentError, "nonce must be #{NONCEBYTES} bytes" unless nonce.bytesize == NONCEBYTES
+      raise LengthError, "nonce must be #{NONCEBYTES} bytes" unless nonce.bytesize == NONCEBYTES
       raise CryptoError, "ciphertext too short" if ciphertext.bytesize < MACBYTES
 
       mac = ciphertext.byteslice(0, MACBYTES)

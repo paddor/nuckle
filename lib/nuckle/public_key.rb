@@ -14,7 +14,7 @@ module Nuckle
       raise TypeError, "public key must be a String or #{PublicKey} (got #{key.class})" unless key.respond_to?(:to_str)
 
       key = key.to_str.b
-      raise ArgumentError, "public key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
+      raise LengthError, "public key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
 
       @key = key.freeze
     end

@@ -272,7 +272,7 @@ module Nuckle
       end
 
       def new_keyed(key)
-        raise ArgumentError, "key must be 32 bytes" unless key.bytesize == KEY_LEN
+        raise LengthError, "key must be 32 bytes" unless key.bytesize == KEY_LEN
 
         Hasher.new(key.b.unpack("V8"), KEYED_HASH)
       end

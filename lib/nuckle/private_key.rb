@@ -22,7 +22,7 @@ module Nuckle
       raise TypeError, "private key must be a String or #{PrivateKey} (got #{key.class})" unless key.respond_to?(:to_str)
 
       key = key.to_str.b
-      raise ArgumentError, "private key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
+      raise LengthError, "private key must be #{BYTES} bytes (got #{key.bytesize})" unless key.bytesize == BYTES
 
       @key = key.freeze
     end

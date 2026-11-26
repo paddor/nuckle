@@ -29,6 +29,9 @@
 ### Added
 
 - `Util.zero?`: checks a string for all zero bytes, with no early exit.
+- `LengthError < ArgumentError`, raised for wrong-size keys, nonces and
+  tags, like `RbNaCl::LengthError`. Code that rescues `ArgumentError`
+  still works.
 
 ### Changed
 
