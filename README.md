@@ -98,9 +98,13 @@ and 550 ops/s at 16 KB.
 
 ## Verification
 
-All primitives are tested against rbnacl/libsodium test vectors
-(NaCl distribution, RFC 7748, RFC 8439) and cross-validated to
-produce byte-identical output.
+Known-answer tests: the NaCl distribution vectors (Box, SecretBox),
+RFC 7748 section 5.2 (X25519, including 1,000 iterations), RFC 8439
+(ChaCha20 block, Poly1305 section 2.5.2 and appendix A.3), the official
+BLAKE3 `test_vectors.json` (all three modes, extended output) and the
+upstream chacha20-blake3 vectors. When the gems are installed, the
+tests also check for byte-identical output against rbnacl/libsodium,
+`blake3-rb` and `chacha20blake3`.
 
 ## License
 

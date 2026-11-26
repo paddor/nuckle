@@ -38,6 +38,10 @@
 - `SECURITY.md`: drop the claims about nonce handling, replay detection
   and CurveZMQ. Nuckle has none of that code; it lives in protocol-zmtp.
   Cover ChaCha20 and BLAKE3.
+- Tests: RFC 7748 section 5.2 vectors (with 1 and 1,000 iterations),
+  non-canonical u-coordinates, all RFC 8439 A.3 Poly1305 vectors, and
+  the official BLAKE3 `test_vectors.json` (hash, keyed hash, derive key,
+  extended output, streaming). README lists what is actually tested.
 
 ## 0.3.0 — 2026-04-20
 
